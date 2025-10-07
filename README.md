@@ -27,8 +27,8 @@ Create a `.env` file in the project root with:
 ```env
 MONGO_URI=mongodb://localhost:27017
 DBNAME=shoefit_dev
-# Optional: override default 3000
-PORT=3000
+# Optional: override default 9999
+PORT=9999
 ```
 
 ### How to Run
