@@ -10,6 +10,7 @@ const UserSchema = new schema(
     address: { type: String },
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: null },
+    last_login: {type: Date, default: Date.now},
     deleted_at: { type: Date, default: null }
   },
   { timestamps: false }
