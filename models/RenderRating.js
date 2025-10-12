@@ -15,4 +15,5 @@ const RenderRatingSchema = new schema(
   { timestamps: false }
 )
 
-module.exports = mongoose.model('RenderRating', RenderRatingSchema, 'renderRatings')
+module.exports = mongoose.models.RenderRating || mongoose.model('RenderRating', RenderRatingSchema, 'renderRatings')
+
