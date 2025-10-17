@@ -30,8 +30,8 @@ class ProductController {
         if(!products){return res.status(404).json({ message: 'Product not found' })}
         res.status(200).json(products)
     } catch (error) {
-        console.error(err)
-        res.status(500).json({ message: 'Error', error: err.message })
+        console.error(error)
+        res.status(500).json({ message: 'Error', error: error.message })
         next()
     }
   }
