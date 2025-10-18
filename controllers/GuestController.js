@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
-const Token = require("../models/Token")
+const Token = require("../models/token")
 class GuestController {
   async createGuestSession(req, res, next) {
     try {
