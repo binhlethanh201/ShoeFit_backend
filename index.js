@@ -6,12 +6,23 @@ const connectDB = require('./config/db')
 const router = require('./routes/index')
 const cors = require('cors')
 
-// ✅ Cấu hình CORS kỹ hơn
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://shoefit-client.pages.dev'
+]
+
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control'], // 👈 Thêm Cache-Control
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control']
 }))
+
 
 app.use(express.json())
 connectDB()
