@@ -1,9 +1,10 @@
 const express = require('express')
 const app = express()
+const morgan = require('morgan')
 require('dotenv').config()
 const port = process.env.PORT || 9999
 const connectDB = require('./config/db')
-const router = require('./routes/index')
+const router = require('./src/routes/index')
 const cors = require('cors')
 
 const allowedOrigins = [
@@ -23,7 +24,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control']
 }))
 
-
+app.use(morgan('dev'))
 app.use(express.json())
 connectDB()
 
