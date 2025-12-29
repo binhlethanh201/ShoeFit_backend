@@ -31,6 +31,8 @@ const UserSchema = new schema(
       default: 'user' 
     },
     avatar: { type: String },
+    phone: { type: String },
+    address: { type: String },
     
     // Nhúng schema đặc điểm chân
     foot_profile: { type: FootProfileSchema, default: {} },

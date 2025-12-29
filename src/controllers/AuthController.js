@@ -99,9 +99,14 @@ exports.login = async (req, res) => {
       { expiresIn: "1d" }
     );
 
+    let redirectUrl = "/";
+    if (user.role === 'admin') redirectUrl = "/admin/dashboard";
+    if (user.role === 'store') redirectUrl = "/store/dashboard";
+
     res.json({
       success: true,
       token,
+      redirectUrl,
       user: {
         id: user._id,
         username: user.username,
@@ -215,7 +220,7 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.user.id; // Get user ID from auth middleware
-    const { fullname, email, avatar } = req.body;
+    const { fullname, email, avatar, phone, address,foot_profile } = req.body;
 
     // Find user
     const user = await User.findById(userId);
@@ -239,6 +244,14 @@ exports.updateProfile = async (req, res) => {
     // Update fields if provided
     if (fullname) user.fullname = fullname;
     if (avatar) user.avatar = avatar;
+    if (phone) user.phone = phone;
+    if (address) user.address = address;
+    if (foot_profile) {
+      user.foot_profile = {
+        ...user.foot_profile, 
+        ...foot_profile      
+      };
+    }
 
     await user.save();
 
@@ -300,5 +313,17 @@ exports.updatePassword = async (req, res) => {
   } catch (error) {
     console.error("Error updating password:", error);
     res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+exports.logout = async (req, res) => {
+  try {
+    res.status(200).json({ 
+      success: true, 
+      message: "Đăng xuất thành công" 
+    });
+  } catch (error) {
+    console.error("Lỗi đăng xuất:", error);
+    res.status(500).json({ success: false, message: "Lỗi server" });
   }
 };
