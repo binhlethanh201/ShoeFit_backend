@@ -1,9 +1,10 @@
 const mongoose = require('mongoose')
 const schema = mongoose.Schema
+const bcrypt = require('bcryptjs');
 
 // Sub-schema cho đặc điểm chân (nhúng trực tiếp vào User)
 const FootProfileSchema = new schema({
-  shoe_size: { type: Number, required: true },
+  shoe_size: { type: Number},
   foot_shape: { 
     type: String, 
     enum: ['narrow', 'standard', 'wide', 'flat'], 
@@ -21,8 +22,9 @@ const FootProfileSchema = new schema({
 const UserSchema = new schema(
   {
     username: { type: String, required: true },
+    fullname: { type: String },
     email: { type: String, required: true, unique: true },
-    password_hash: { type: String, required: true, select: false },
+    password: { type: String, required: true, select: false },
     role: { 
       type: String, 
       enum: ['user', 'store', 'admin'], 
@@ -44,5 +46,22 @@ const UserSchema = new schema(
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } 
   }
 )
+// Hook pre-save để hash password
+UserSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+//Method comparePassword
+UserSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 module.exports = mongoose.model('User', UserSchema, 'users')

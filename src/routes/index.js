@@ -1,30 +1,32 @@
 const express = require('express')
 const router = express.Router()
 
-const userRouter = require('./User')
-const productRouter = require('./Product')
-const categoryRouter = require('./Category')
-const aiGenerationRouter = require('./AIGeneration') 
-const promptTemplateRouter = require('./PromptTemplate')
-const feedbackRouter = require('./Feedback')
-const styleTipRouter = require('./StyleTip')
+// const userRouter = require('./User')
+// const productRouter = require('./Product')
+// const categoryRouter = require('./Category')
+// const aiGenerationRouter = require('./AIGeneration') 
+// const promptTemplateRouter = require('./PromptTemplate')
+// const feedbackRouter = require('./Feedback')
+// const styleTipRouter = require('./StyleTip')
+const authRouter = require('./Auth')
 
 // --- Định nghĩa Route ---
 
 // User & Auth
-router.use('/users', userRouter)
+router.use('/auth', authRouter)
+// router.use('/users', userRouter)
 
 // Product & Category
-router.use('/products', productRouter)
-router.use('/categories', categoryRouter)
+// router.use('/products', productRouter)
+// router.use('/categories', categoryRouter)
 
 // AI & Renders
-router.use('/renders', aiGenerationRouter) 
-router.use('/promptTemplates', promptTemplateRouter)
+// router.use('/renders', aiGenerationRouter) 
+// router.use('/promptTemplates', promptTemplateRouter)
 
 // Style & Feedback
-router.use('/feedbacks', feedbackRouter)
-router.use('/styletips', styleTipRouter)
+// router.use('/feedbacks', feedbackRouter)
+// router.use('/styletips', styleTipRouter)
 
 
 module.exports = router
