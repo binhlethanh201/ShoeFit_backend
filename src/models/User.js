@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const schema = mongoose.Schema
 const bcrypt = require('bcryptjs');
 
-// Sub-schema cho đặc điểm chân (nhúng trực tiếp vào User)
+// Sub-schema FootProfile
 const FootProfileSchema = new schema({
   shoe_size: { type: Number},
   foot_shape: { 
@@ -19,6 +19,19 @@ const FootProfileSchema = new schema({
   preferred_style: [{ type: String }]
 }, { _id: false })
 
+// Sub-schema Preference
+const PreferencesSchema = new schema({
+  language: { type: String, default: 'vi' },
+  shoe_size_unit: { type: String, enum: ['EU', 'US', 'UK', 'VN'], default: 'EU' },
+  theme: { type: String, default: 'light' }
+}, { _id: false })
+
+// Sub-schema Notification
+const NotificationSettingsSchema = new schema({
+  email: { type: Boolean, default: true },
+  promo: { type: Boolean, default: false }
+}, { _id: false })
+
 const UserSchema = new schema(
   {
     username: { type: String, required: true },
@@ -33,13 +46,10 @@ const UserSchema = new schema(
     avatar: { type: String },
     phone: { type: String },
     address: { type: String },
-    
-    // Nhúng schema đặc điểm chân
     foot_profile: { type: FootProfileSchema, default: {} },
-    
-    // Mảng ID các sản phẩm yêu thích
     wishlist: [{ type: schema.Types.ObjectId, ref: 'Product' }],
-
+    preferences: { type: PreferencesSchema, default: {} },
+    notification_settings: { type: NotificationSettingsSchema, default: {} },
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },
     isActive: { type: Boolean }
@@ -48,7 +58,8 @@ const UserSchema = new schema(
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } 
   }
 )
-// Hook pre-save để hash password
+
+// Hook pre-save hash password
 UserSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   

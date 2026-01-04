@@ -219,21 +219,22 @@ exports.getProfile = async (req, res) => {
 // Update user profile
 exports.updateProfile = async (req, res) => {
   try {
-    const userId = req.user.id; // Get user ID from auth middleware
-    const { fullname, email, avatar, phone, address,foot_profile } = req.body;
+    const userId = req.user.id; 
+    const { fullname, email, avatar, phone, address, foot_profile, preferences, notification_settings } = req.body;
 
-    // Find user
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Validate email if provided
+    const oldPromoSetting = user.notification_settings?.promo;
+    const oldEmailSetting = user.notification_settings?.email;
+
     if (email && email !== user.email) {
       if (!validateEmail(email)) {
         return res.status(400).json({ success: false, message: "Invalid email format" });
       }
-      // Check if email is already in use
+
       const existingUser = await User.findOne({ email, _id: { $ne: userId } });
       if (existingUser) {
         return res.status(400).json({ success: false, message: "Email already in use" });
@@ -241,26 +242,42 @@ exports.updateProfile = async (req, res) => {
       user.email = email;
     }
 
-    // Update fields if provided
     if (fullname) user.fullname = fullname;
     if (avatar) user.avatar = avatar;
     if (phone) user.phone = phone;
     if (address) user.address = address;
     if (foot_profile) {
-      user.foot_profile = {
-        ...user.foot_profile, 
-        ...foot_profile      
-      };
+      user.foot_profile = { ...user.foot_profile, ...foot_profile };
     }
-
+    if (preferences) {
+      user.preferences = { ...user.preferences, ...preferences };
+    }
+    if (notification_settings) {
+      user.notification_settings = { ...user.notification_settings, ...notification_settings };
+    }
     await user.save();
 
-    // Return updated user (without password)
+    if (notification_settings) {
+      const emailTo = user.email;
+      const userName = user.fullname || user.username;
+
+      if (notification_settings.promo === true && !oldPromoSetting) {
+        const subject = "ShoeFit - Đăng ký tin khuyến mãi thành công";
+        const text = `Xin chào ${userName},\n\nCảm ơn bạn đã đăng ký nhận bản tin khuyến mãi từ ShoeFit.\nChúng tôi sẽ gửi đến bạn những ưu đãi mới nhất và xu hướng thời trang hot nhất!\n\nTrân trọng,\nĐội ngũ ShoeFit.`;
+        sendEmail(emailTo, subject, text).catch(err => console.error("Lỗi gửi mail promo:", err));
+      }
+      if (notification_settings.email === true && oldEmailSetting === false) {
+        const subject = "ShoeFit - Cập nhật cài đặt thông báo";
+        const text = `Xin chào ${userName},\n\nBạn đã bật lại tính năng nhận thông báo đơn hàng qua email.\nChúng tôi sẽ cập nhật trạng thái đơn hàng của bạn qua địa chỉ này.\n\nTrân trọng,\nĐội ngũ ShoeFit.`;
+        
+        sendEmail(emailTo, subject, text).catch(err => console.error("Lỗi gửi mail notif:", err));
+      }
+    }
     const updatedUser = await User.findById(userId).select('-password');
 
     res.json({
       success: true,
-      message: "Profile updated successfully",
+      message: "Cập nhật thành công",
       data: updatedUser
     });
   } catch (error) {
